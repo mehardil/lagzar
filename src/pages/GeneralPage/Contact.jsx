@@ -1,6 +1,6 @@
 import React from "react";
 
-import Footer from "../components/Footer"; // Import Footer
+
 
 const Contact = () => {
   return (
