@@ -25,7 +25,7 @@ const Navbar = () => {
           {/* Center Section - Logo */}
           <div className="flex-1 flex justify-center">
             <Link to="/">
-              <img src="/logo.png" alt="Logo" className="h-8" />
+              <img src="layzer/src/assets/jeweltotelogo (1).png" alt="Logo" className="h-8" />
             </Link>
           </div>
 

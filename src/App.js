@@ -28,8 +28,7 @@ const App = () => {
         <Route path="/customization" element={<Customization />} />
         <Route path="/general-queries" element={<GeneralQueries />} />
         <Route path="/track-order" element={<TrackOrder />} />
-        <Route path="/productpage" element={<ProductPage />} />
-
+        <Route path="/product/:id" element={<ProductPage />} />
       </Routes>
     </Router>
   );
