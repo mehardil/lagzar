@@ -2,21 +2,25 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { ShoppingCart, MessageCircle } from "lucide-react";
 import Footer from "../components/Footer";
+import { useNavigate } from "react-router-dom";
+
 
 export default function ProductPage() {
   const { id } = useParams();
-
+  const navigate = useNavigate();
   const [product, setProduct] = useState(null);
   const [reviews, setReviews] = useState([]);
   const [relatedProducts, setRelatedProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);  // Modal state
+  const [modalImage, setModalImage] = useState(""); // Image for the modal
 
   useEffect(() => {
     const fetchProductDetails = async () => {
       try {
         const productRes = await fetch(`http://127.0.0.1:8000/products/${id}`);
-        const reviewRes = await fetch("http://127.0.0.1:8000/review");
+        const reviewRes = await fetch(`http://127.0.0.1:8000/review/${id}`);
         const allProductsRes = await fetch("http://127.0.0.1:8000/products");
 
         if (!productRes.ok || !reviewRes.ok || !allProductsRes.ok) {
@@ -51,8 +55,22 @@ export default function ProductPage() {
     fetchProductDetails();
   }, [id]);
 
+  const openModal = (image) => {
+    setModalImage(image);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setModalImage("");
+  };
+
   if (loading) return <p className="text-center mt-10">Loading...</p>;
   if (error) return <p className="text-center text-red-500 mt-10">{error}</p>;
+
+  // Main Product Image: either product.image_url or the first image in product.images
+  const productImage =
+    product?.image_url || (product?.images?.[0] || "/path/to/placeholder/image.jpg");
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -60,58 +78,71 @@ export default function ProductPage() {
         {/* Product Details */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-start">
           <div>
-            <div className="w-full h-96 overflow-hidden rounded-xl shadow-lg border border-gray-200">
+            {/* Main Product Image */}
+            <div
+              className="w-full h-96 overflow-hidden rounded-xl shadow-lg border border-gray-200 cursor-pointer"
+              onClick={() => openModal(productImage)}  // Open modal when clicked
+            >
               <img
-                src={product.image_url}
-                alt={product.name}
+                src={productImage}
+                alt={product?.name || "Product Image"}
                 className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
               />
             </div>
 
+            {/* Additional Product Images */}
             <div className="mt-4 flex gap-4 overflow-x-auto">
-              {[product.image_url].map((image, index) => (
-                <div
-                  key={index}
-                  className="w-24 h-24 overflow-hidden rounded-lg shadow-md cursor-pointer"
-                >
-                  <img
-                    src={image}
-                    alt={`Product image ${index + 1}`}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              ))}
+              {product?.images && product.images.length > 0 ? (
+                product.images.map((image, index) => (
+                  <div
+                    key={index}
+                    className="w-24 h-24 overflow-hidden rounded-lg shadow-md cursor-pointer"
+                    onClick={() => openModal(image)}  // Open modal for additional images
+                  >
+                    <img
+                      src={image}
+                      alt={`Product image ${index + 1}`}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                ))
+              ) : (
+                <p>No additional images available</p>
+              )}
             </div>
           </div>
 
           <div>
-            <h2 className="text-3xl font-bold mb-2 text-gray-900">{product.name}</h2>
-            <p className="text-gray-600 text-lg">Brand: {product.brand || "N/A"}</p>
+            <h2 className="text-3xl font-bold mb-2 text-gray-900">{product?.name}</h2>
+            <p className="text-gray-600 text-lg">Brand: {product?.brand || "N/A"}</p>
             <div className="flex items-center gap-2 my-4">
-              <span className="text-red-500 text-2xl font-bold">Rs. {product.price}</span>
-              {product.originalPrice && (
+              <span className="text-red-500 text-2xl font-bold">Rs. {product?.price}</span>
+              {product?.originalPrice && (
                 <span className="line-through text-gray-400 text-lg">
-                  Rs. {product.originalPrice}
+                  Rs. {product?.originalPrice}
                 </span>
               )}
             </div>
-            <p className="text-sm text-gray-600 mb-1">Category: {product.category}</p>
+            <p className="text-sm text-gray-600 mb-1">Category: {product?.category}</p>
             <p className="text-sm text-gray-600 mb-1">
-              Available Quantity: {product.quantity}
+              Available Quantity: {product?.quantity}
             </p>
             {/* Product Dimensions and Weight */}
             <div className="mt-4">
               <h3 className="text-xl font-semibold text-gray-900">Dimensions & Weight</h3>
               <ul className="text-sm text-gray-600">
-                <li>Length: {product.length_in} inches</li>
-                <li>Width: {product.width_in} inches</li>
-                <li>Height: {product.height_in} inches</li>
-                <li>Weight: {product.weight_grams} grams</li>
-                <li>Material: {product.material}</li>
+                <li>Length: {product?.length_in} inches</li>
+                <li>Width: {product?.width_in} inches</li>
+                <li>Height: {product?.height_in} inches</li>
+                <li>Weight: {product?.weight_grams} grams</li>
+                <li>Material: {product?.material}</li>
               </ul>
             </div>
             <div className="flex gap-4 mt-6">
-              <button className="bg-black text-white px-6 py-3 rounded-lg flex items-center gap-2 hover:bg-gray-900 transition duration-300 shadow-md">
+            <button
+                onClick={() => navigate(`/order/${product?.id}`)}
+                className="bg-black text-white px-6 py-3 rounded-lg flex items-center gap-2 hover:bg-gray-900 transition duration-300 shadow-md"
+              >
                 <ShoppingCart size={18} /> Add to Cart
               </button>
               <button className="bg-gray-200 text-black px-6 py-3 rounded-lg flex items-center gap-2 hover:bg-gray-300 transition duration-300 shadow-md">
@@ -176,6 +207,20 @@ export default function ProductPage() {
           </div>
         )}
       </div>
+
+      {/* Fullscreen Modal for Image */}
+      {isModalOpen && (
+        <div
+          className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-70 flex items-center justify-center z-50"
+          onClick={closeModal}
+        >
+          <img
+            src={modalImage}
+            alt="Fullscreen Product"
+            className="max-w-full max-h-full object-contain cursor-pointer"
+          />
+        </div>
+      )}
 
       <Footer />
     </div>

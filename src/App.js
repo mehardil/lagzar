@@ -12,6 +12,7 @@ import GeneralQueries from "./pages/GeneralPage/GeneralQueries";
 
 import TrackOrder from "./pages/TrackOrder";
 import ProductPage from "./pages/ProductPage.jsx";
+import CheckoutPage from "./pages/OrderPage/CheckoutPage.jsx";
 
 const App = () => {
   return (
@@ -28,7 +29,9 @@ const App = () => {
         <Route path="/customization" element={<Customization />} />
         <Route path="/general-queries" element={<GeneralQueries />} />
         <Route path="/track-order" element={<TrackOrder />} />
+        <Route path="/order/:id" element={<CheckoutPage />} />
         <Route path="/product/:id" element={<ProductPage />} />
+        
       </Routes>
     </Router>
   );

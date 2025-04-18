@@ -9,7 +9,8 @@ const Clutches = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await fetch("http://127.0.0.1:8000/products/");
+        let category = 'clutches'
+        const response = await fetch(`http://127.0.0.1:8000/category/${category}`);
         
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);

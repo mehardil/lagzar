@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import ProductCard from "../../components/ProductCard"; // Import the new component
+import Footer from "../../components/Footer";
 
 const BestSelling = () => {
   const [products, setProducts] = useState([]);
@@ -9,7 +10,8 @@ const BestSelling = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await fetch("http://127.0.0.1:8000/products/");
+        let category = 'Best Selling'
+        const response = await fetch(`http://127.0.0.1:8000/category/${category}`);
         
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
@@ -30,6 +32,7 @@ const BestSelling = () => {
 
   if (loading) {
     return (
+      
       <div className="container mx-auto py-20 text-center">
         <p className="text-xl text-gray-600">Loading products...</p>
       </div>
@@ -45,6 +48,8 @@ const BestSelling = () => {
   }
 
   return (
+    
+   <div className="flex flex-col min-h-screen">
     <div className="container mx-auto py-12 px-4">
       <div className="text-center">
         <h2 className="text-3xl font-bold">Best Selling Products</h2>
@@ -62,6 +67,8 @@ const BestSelling = () => {
           <p className="text-xl text-gray-500">No products available at the moment.</p>
         </div>
       )}
+    </div>
+    <Footer />
     </div>
   );
 };

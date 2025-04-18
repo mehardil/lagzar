@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import ProductCard from "../../components/ProductCard"; // Import the new component
+import Footer from "../../components/Footer";
 
 const Shop = () => {
   const [products, setProducts] = useState([]);
@@ -45,6 +46,7 @@ const Shop = () => {
   }
 
   return (
+    <div className="flex flex-col min-h-screen">
     <div className="container mx-auto py-12 px-4">
       <div className="text-center">
         <h2 className="text-3xl font-bold">Best Selling Products</h2>
@@ -63,6 +65,9 @@ const Shop = () => {
         </div>
       )}
     </div>
+        <Footer />
+        </div>
+
   );
 };
 

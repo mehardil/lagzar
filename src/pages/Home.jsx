@@ -1,38 +1,67 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import ProductCard from "../components/ProductCard";
+import Footer from "../components/Footer";
 
 const Home = () => {
-  const bestSellers = [
-    {
-      id: 1,
-      image: "https://via.placeholder.com/300", // Replace with actual image URL
-      title: "Black Crystal Bag",
-    },
-    {
-      id: 2,
-      image: "https://via.placeholder.com/300", // Replace with actual image URL
-      title: "Golden Pearl Bag",
-    },
-    {
-      id: 3,
-      image: "https://via.placeholder.com/300", // Replace with actual image URL
-      title: "Silver Beaded Bag",
-    },
-    {
-      id: 4,
-      image: "https://via.placeholder.com/300", // Replace with actual image URL
-      title: "Pink Crystal Bag",
-    },
-  ];
+  const [bestSellers, setBestSellers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [heroProducts, setHeroProducts] = useState([]);
+  const [currentHeroIndex, setCurrentHeroIndex] = useState(0);
+
+  // Utility to select random products
+  const getRandomProducts = (products, count) => {
+    const shuffled = [...products].sort(() => 0.5 - Math.random());
+    return shuffled.slice(0, count);
+  };
+
+  useEffect(() => {
+    const fetchBestSellers = async () => {
+      try {
+        const response = await fetch("http://127.0.0.1:8000/products/");
+        if (!response.ok) throw new Error(`Error: ${response.status}`);
+        const data = await response.json();
+        setBestSellers(data);
+
+        const selected = getRandomProducts(data, 20); // Select 5 random products
+        setHeroProducts(selected);
+        setLoading(false);
+      } catch (err) {
+        setError("Failed to fetch best-selling products.");
+        setLoading(false);
+      }
+    };
+
+    fetchBestSellers();
+  }, []);
+
+  // Rotate hero images every 5 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentHeroIndex((prevIndex) =>
+        heroProducts.length ? (prevIndex + 1) % heroProducts.length : 0
+      );
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [heroProducts]);
 
   return (
+    <div className="flex flex-col min-h-screen">
     <div className="container mx-auto py-10 px-4">
       {/* Hero Section */}
-      <div className="relative w-full h-[500px] bg-gray-200 flex items-center justify-center">
-        <img
-          src="https://as2.ftcdn.net/v2/jpg/03/77/21/83/1000_F_377218354_gyHMm7epZKcmygJaHZoWEJJzB5nOWhZ2.jpg" // Replace with actual image URL
-          alt="Hero Banner"
-          className="w-full h-full object-cover"
-        />
+      <div className="relative w-full h-[500px] bg-gray-200 flex items-center justify-center overflow-hidden group rounded-xl">
+        {heroProducts.length > 0 ? (
+          <img
+            src={heroProducts[currentHeroIndex].image_url}
+            alt={heroProducts[currentHeroIndex].name}
+            className="w-full h-full object-cover transform transition-transform duration-1000 ease-in-out group-hover:scale-105"
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center text-gray-500">
+            Loading hero images...
+          </div>
+        )}
         <div className="absolute inset-0 flex flex-col items-center justify-center bg-black bg-opacity-50 text-white text-center px-4">
           <h1 className="text-5xl font-bold">Carry Unique Crystal Fashion</h1>
           <p className="mt-4 text-lg max-w-2xl">
@@ -50,29 +79,34 @@ const Home = () => {
         <p className="mt-2 text-gray-600">Best Seller</p>
       </div>
 
-      {/* Best Seller Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mt-10">
-        {bestSellers.map((item) => (
-          <div key={item.id} className="relative bg-white shadow-md rounded-lg overflow-hidden">
-            <span className="absolute top-2 left-2 bg-gray-800 text-white text-xs px-2 py-1 rounded">ON SALE</span>
-            <img src={item.image} alt={item.title} className="w-full h-64 object-cover" />
-            <div className="p-4 text-center">
-              <h3 className="text-lg font-semibold">{item.title}</h3>
-            </div>
-          </div>
-        ))}
-      </div>
+      {/* Product Cards */}
+      {loading ? (
+        <div className="text-center py-10 text-gray-600">Loading...</div>
+      ) : error ? (
+        <div className="text-center py-10 text-red-600">{error}</div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 mt-10">
+      {bestSellers.map((product) => (
+        <ProductCard key={product.id} product={product} />
+  ))}
+</div>
+
+
+      )}
 
       {/* WhatsApp Button */}
       <div className="fixed bottom-5 left-5">
         <a href="https://wa.me/1234567890" target="_blank" rel="noopener noreferrer">
           <img
-            src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" // Replace with actual WhatsApp icon
+            src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg"
             alt="WhatsApp Chat"
             className="w-12 h-12"
           />
         </a>
       </div>
+     
+    </div>
+     <Footer />
     </div>
   );
 };

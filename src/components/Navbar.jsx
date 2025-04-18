@@ -22,12 +22,7 @@ const Navbar = () => {
             <span className="text-xs">▼</span>
           </div>
 
-          {/* Center Section - Logo */}
-          <div className="flex-1 flex justify-center">
-            <Link to="/">
-              <img src="layzer/src/assets/jeweltotelogo (1).png" alt="Logo" className="h-8" />
-            </Link>
-          </div>
+
 
           {/* Right Section - Account, Search, Cart */}
           <div className="hidden md:flex items-center space-x-6 text-gray-500 text-sm">
